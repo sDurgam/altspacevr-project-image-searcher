@@ -4,6 +4,7 @@ import retrofit.Callback;
 
 import retrofit.http.GET;
 import retrofit.http.Query;
+import testsample.altvr.com.testsample.events.PhotosEvent;
 import testsample.altvr.com.testsample.vo.PhotoResponseVo;
 
 public interface PixabayRetrofitService {

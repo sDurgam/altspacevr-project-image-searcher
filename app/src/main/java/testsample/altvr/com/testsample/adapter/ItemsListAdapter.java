@@ -6,16 +6,20 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.ListViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import testsample.altvr.com.testsample.R;
@@ -42,7 +46,9 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public ItemsListAdapter(List<PhotoVo> items, ItemListener listener, int imageWidth, Context context) {
-        mItems = items;
+        //mItems = items;
+        mItems = new ArrayList<>();
+        mItems.addAll(items);
         mListener = listener;
         mImageWidth = imageWidth;
         mContext = context;
@@ -50,7 +56,8 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, final int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, final int viewType)
+    {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.adapter_photos_item, viewGroup, false);
         return new ItemViewHolder(view);
     }
@@ -66,6 +73,24 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
          * For part 1b, you should attach a click listener to the save label so users can save
          * or delete photos from their local db.
          */
+        ItemViewHolder itemholder = (ItemViewHolder) holder;
+        PhotoVo photo = mItems.get(position);
+        ((ItemViewHolder) holder).itemName.setText(photo.tags);
+        Picasso.with(mContext).load(photo.webformatURL)
+                .placeholder(android.R.drawable.progress_horizontal)
+                .transform(new ItemImageTransformation(mImageWidth))
+                .into(itemholder.itemImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        LogUtil.log("Success loading the image");
+                    }
+
+                    @Override
+                    public void onError()
+                    {
+                        LogUtil.log("Error loading the image");
+                    }
+                });
     }
 
     @Override
@@ -96,5 +121,16 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             itemImage = (ImageView) itemView.findViewById(R.id.itemImage);
             saveText = (TextView) itemView.findViewById(R.id.saveText);
         }
+    }
+
+    //Method to update recycler view data items
+    public void swap(List<PhotoVo> photoVoList)
+    {
+        if(mItems != null)
+        {
+            mItems.clear();
+        }
+        mItems.addAll(photoVoList);
+        notifyDataSetChanged();
     }
 }

@@ -76,6 +76,11 @@ public class RetrofitAdapter {
     private static String getFirstValue(HashMap<String, String[]> hashMap) {
         return hashMap.entrySet().iterator().next().getValue()[0];
     }
+
+    public static String getAPIKey()
+    {
+        return API_KEY;
+    }
 }
 
 

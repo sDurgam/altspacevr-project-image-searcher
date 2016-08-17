@@ -16,7 +16,8 @@ import testsample.altvr.com.testsample.fragments.PhotosFragment;
 import testsample.altvr.com.testsample.service.ApiService;
 import testsample.altvr.com.testsample.util.LogUtil;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
     private LogUtil log = new LogUtil(MainActivity.class);
     private ApiService mService;
     SearchView mSearchView;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         mService = new ApiService(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mService.getDefaultPhotos();
         displayFragment(PhotosFragment.newInstance(), R.string.toolbar_main_title);
     }
 

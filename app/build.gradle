@@ -15,18 +15,22 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file(properties.getProperty("signing.storeFile"))
-            storePassword properties.getProperty("signing.storePassword")
-            keyAlias properties.getProperty("signing.keyAlias")
-            keyPassword properties.getProperty("signing.keyPassword")
+//            storeFile file(properties.getProperty("signing.storeFile"))
+//            storePassword properties.getProperty("signing.storePassword")
+//            keyAlias properties.getProperty("signing.keyAlias")
+//            keyPassword properties.getProperty("signing.keyPassword")
         }
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            //signingConfig signingConfigs.release
         }
+        debug
+                {
+                    minifyEnabled false
+                }
     }
     packagingOptions {
         exclude 'META-INF/ASL2.0'
@@ -42,6 +46,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
+
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.squareup.retrofit:converter-jackson:1.9.0'
     compile 'org.greenrobot:eventbus:3.0.0'

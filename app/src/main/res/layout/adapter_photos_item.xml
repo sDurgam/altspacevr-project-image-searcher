@@ -9,6 +9,7 @@
         android:id="@+id/itemImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:scaleType="fitStart"
         android:adjustViewBounds="true"
         android:tintMode="multiply"
         />
@@ -39,9 +40,7 @@
         android:minHeight="60dp"
         android:gravity="center_vertical"
         style="@style/title"
-        android:text="@string/saved"
+        android:text="@string/save"
         />
-
-
 
 </RelativeLayout>

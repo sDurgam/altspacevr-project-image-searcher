@@ -21,6 +21,7 @@ import testsample.altvr.com.testsample.R;
 import testsample.altvr.com.testsample.adapter.ItemsListAdapter;
 import testsample.altvr.com.testsample.events.ApiErrorEvent;
 import testsample.altvr.com.testsample.events.PhotosEvent;
+import testsample.altvr.com.testsample.listeners.RecyclerViewScrollListener;
 import testsample.altvr.com.testsample.service.ApiService;
 import testsample.altvr.com.testsample.util.DatabaseUtil;
 import testsample.altvr.com.testsample.util.LogUtil;
@@ -71,6 +72,8 @@ public class PhotosFragment extends Fragment{
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         itemsListRecyclerView.setLayoutManager(linearLayoutManager);
         itemsListRecyclerView.setHasFixedSize(true);
+        itemsListRecyclerView.setOnScrollListener(new RecyclerViewScrollListener(getContext()));
+
         mListAdapter = new ItemsListAdapter(mItemsData, new ItemClickedListener(), getResources().getDisplayMetrics().widthPixels, getContext());
         itemsListRecyclerView.setAdapter(mListAdapter);
     }
@@ -105,7 +108,8 @@ public class PhotosFragment extends Fragment{
     }
 
     @Subscribe
-    public void onEvent(PhotosEvent event) {
+    public void onEvent(PhotosEvent event)
+    {
         /**
          * YOUR CODE HERE
          *
@@ -116,12 +120,24 @@ public class PhotosFragment extends Fragment{
          *
          * For part 2b you should update this to handle the case where the user has saved photos.
          */
-
-
+        fetchingItems.setVisibility(View.GONE);
+        LogUtil.log("photos fetch success event");
+          if(mItemsData.size() == 0)
+          {
+              mItemsData.clear();
+              mItemsData.addAll((ArrayList<PhotoVo>)event.data);
+              mListAdapter.swap (mItemsData);
+          }
+        else {
+              mItemsData.clear();
+              mListAdapter.swap(mItemsData);
+          }
+        //setupItemsList();
     }
 
     @Subscribe
-    public void onEvent(ApiErrorEvent event) {
+    public void onEvent(ApiErrorEvent event)
+    {
         /**
          * YOUR CODE HERE
          *
@@ -132,3 +148,4 @@ public class PhotosFragment extends Fragment{
     }
 
 }
+
