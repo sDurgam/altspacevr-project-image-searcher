@@ -11,6 +11,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.http.Query;
+import testsample.altvr.com.testsample.R;
 import testsample.altvr.com.testsample.RetrofitAdapter;
 import testsample.altvr.com.testsample.PixabayRetrofitService;
 import testsample.altvr.com.testsample.events.ApiErrorEvent;
@@ -20,7 +21,8 @@ import testsample.altvr.com.testsample.util.LogUtil;
 import testsample.altvr.com.testsample.vo.PhotoResponseVo;
 import testsample.altvr.com.testsample.vo.PhotoVo;
 
-public class ApiService {
+public class ApiService
+{
     private LogUtil log = new LogUtil(ApiService.class);
     private static String PIXABAY_API_KEY = "2387134-2e9952af7d840c1d7abc947b1";
     private static int MIN_IMAGE_WIDTH = 1000;
@@ -29,47 +31,65 @@ public class ApiService {
 
     private PixabayRetrofitService mService;
     private EventBus mEventBus;
+    private Context mContext;
 
-    public ApiService(Context context) {
+    public ApiService(Context context)
+    {
+        mContext = context;
         mService = RetrofitAdapter.getRestService(context);
         mEventBus = EventBus.getDefault();
     }
 
     /**
      * YOUR CODE HERE
-     *
+     * <p/>
      * For part 1a, you should implement getDefaultPhotos and searchPhotos. These calls should make the proper
      * API calls to Pixabay and post PhotosEvents to the event bus for the fragments to fill themselves in.
-     *
+     * <p/>
      * We provide a Retrofit API adapter here you can use, or you can roll your own using the HTTP library
      * of your choice.
      */
 
     //Get Default photos using Pixabay api
     //getDefaultPhotos(@Query("key") String key, @Query("min_width") int minWidth, @Query("min_height") int minHeight, @Query("image_type") String imageType, Callback<PhotoResponseVo> callback)
-     public void getDefaultPhotos()
-     {
-        mService.getDefaultPhotos(RetrofitAdapter.getAPIKey(), 0, 0, Constants.photoTag, new Callback<PhotoResponseVo>()
+    public void getDefaultPhotos(final int pagenumber)
+    {
+        mService.getDefaultPhotos(RetrofitAdapter.getAPIKey(), 0, 0, Constants.photoTag, pagenumber, new Callback<PhotoResponseVo>()
         {
             @Override
             public void success(PhotoResponseVo photoResponseVo, Response response)
             {
-                LogUtil.log("success in fetching default photos");
-                //check if response is empty or not
-                if(photoResponseVo != null && photoResponseVo.hits != null)
+                LogUtil.log(mContext.getResources().getString(R.string.getdefaultphotos_success_str));
+                int totalphotoscount = (int) (Math.ceil(pagenumber) * Constants.photosperpageCount);
+                if (photoResponseVo != null && photoResponseVo.hits != null) //check if response is empty or not
                 {
-                    List<PhotoVo> photosList = (List<PhotoVo>) photoResponseVo.hits;
-                    PhotosEvent photosevent = new PhotosEvent(photosList);
-                    mEventBus.post(photosevent);
+                    if (photoResponseVo.total > totalphotoscount)   //check to see if you have any photos to load
+                    {
+                        List<PhotoVo> photosList = (List<PhotoVo>) photoResponseVo.hits;
+                        PhotosEvent photosevent = new PhotosEvent(photosList);
+                        mEventBus.post(photosevent);
+                    }
+                    else if (photoResponseVo.total == totalphotoscount)   //check to see if you have any photos to load
+                    {
+                        LogUtil.log(mContext.getResources().getString(R.string.nomorephotosstring));
+                    }
+                    else
+                    {
+                        //clear and whole list
+                    }
+                }
+                else
+                {
+                    LogUtil.log(mContext.getResources().getString(R.string.getdefaultphotos_noresponsestr));
                 }
             }
 
             @Override
             public void failure(RetrofitError error)
             {
-                LogUtil.log("failure in fetching default photos");
+                LogUtil.log(mContext.getResources().getString(R.string.getdefaultphotos_errorstr));
                 mEventBus.post(new ApiErrorEvent(error.toString()));
             }
         });
-     }
+    }
 }

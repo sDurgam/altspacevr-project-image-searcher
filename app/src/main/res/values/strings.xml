@@ -15,6 +15,8 @@
     <string name="unsaved">Unsaved</string>
     <string name="save">Save</string>
     <string name="unsave">Unsave</string>
-
-
+    <string name="nomorephotosstring">No more photos to load</string>
+    <string name="getdefaultphotos_errorstr">Failed to fetch default photos"</string>
+    <string name="getdefaultphotos_success_str">"Successfully fetched default photos"</string>
+    <string name="getdefaultphotos_noresponsestr">"Successfully fetched default photos"</string>
 </resources>

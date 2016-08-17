@@ -8,4 +8,6 @@ public class Constants
     public static final String lowresphotoTag = "previewURL";
     public static final String mediumresphotoTag = "webformatURL";
     public static final String photoTag = "photo";
+    public static final int photosperpageCount = 20;
+    public static final String inlastpageMessage = "No more photos to load";
 }
