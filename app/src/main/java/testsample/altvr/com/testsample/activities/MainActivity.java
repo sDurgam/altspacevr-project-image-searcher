@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity
         mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
         mSearchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
+        mSearchView.setIconifiedByDefault(true);
         mSearchView.setOnQueryTextListener(queryTextListener);
         mSearchView.setOnCloseListener(searchCloseListener);
         mSearchView.clearFocus();
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public boolean onClose()
         {
+            mSearchView.onActionViewCollapsed();
             SearchEvent searchEvent = new SearchEvent(null);
             mEventBus.post(searchEvent);
             return false;
