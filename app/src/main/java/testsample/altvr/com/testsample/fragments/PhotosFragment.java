@@ -3,14 +3,12 @@ package testsample.altvr.com.testsample.fragments;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -21,7 +19,7 @@ import testsample.altvr.com.testsample.R;
 import testsample.altvr.com.testsample.adapter.ItemsListAdapter;
 import testsample.altvr.com.testsample.events.ApiErrorEvent;
 import testsample.altvr.com.testsample.events.PhotosEvent;
-import testsample.altvr.com.testsample.events.SearchEvent;
+import testsample.altvr.com.testsample.events.SearchPhotosEvent;
 import testsample.altvr.com.testsample.listeners.RecyclerViewScrollListener;
 import testsample.altvr.com.testsample.service.ApiService;
 import testsample.altvr.com.testsample.util.DatabaseUtil;
@@ -33,7 +31,7 @@ public class PhotosFragment extends Fragment{
     private LinearLayout fetchingItems;
     private RecyclerView itemsListRecyclerView;
     private ApiService mService;
-    Snackbar snackbar;
+
 
     private ArrayList<PhotoVo> mItemsData = new ArrayList<>();
     private ItemsListAdapter mListAdapter;
@@ -66,10 +64,10 @@ public class PhotosFragment extends Fragment{
     {
         fetchingItems = (LinearLayout) view.findViewById(R.id.listEmptyView);
         itemsListRecyclerView = (RecyclerView) view.findViewById(R.id.photosListRecyclerView);
-        makeSnackBar();
     }
 
-    private void setupViews() {
+    private void setupViews()
+    {
         fetchingItems.setVisibility(View.VISIBLE);
         setupItemsList();
         EventBus.getDefault().register(this);
@@ -127,11 +125,6 @@ public class PhotosFragment extends Fragment{
     public void onPause()
     {
         super.onPause();
-        if(snackbar.isShown())
-        {
-            snackbar.dismiss();
-        }
-        snackbar = null;
         EventBus.getDefault().unregister(this);
     }
 
@@ -143,29 +136,18 @@ public class PhotosFragment extends Fragment{
         mListAdapter = null;
     }
 
-    private void makeSnackBar()
-    {
-        if(snackbar == null)
-        {
-            snackbar = Snackbar.make(getActivity().findViewById(R.id.mainCoordinateLayout), R.string.app_name, Snackbar.LENGTH_SHORT);
-        }
-    }
-
     private void displaySnackBar(String message)
     {
         fetchingItems.setVisibility(View.GONE);
-        makeSnackBar();
-        View snackView = snackbar.getView();
-        TextView snackTextView = (TextView) snackView.findViewById(android.support.design.R.id.snackbar_text);
-        snackTextView.setText(message);
+        Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.mainCoordinateLayout),message, Snackbar.LENGTH_SHORT);
         snackbar.show();
     }
 
     //Event to switch between default mode and search mode
     @Subscribe
-    public void onEvent(SearchEvent event)
+    public void onEvent(SearchPhotosEvent event)
     {
-        String query = ((SearchEvent)event).query;
+        String query = ((SearchPhotosEvent)event).query;
         if(query == null)
         {
             searchQuery = null;
@@ -193,7 +175,6 @@ public class PhotosFragment extends Fragment{
          * For part 2b you should update this to handle the case where the user has saved photos.
          */
         fetchingItems.setVisibility(View.GONE);
-        LogUtil.log("photos fetch success event");
         updateAdapterDataSet((ArrayList<PhotoVo>)event.data);
     }
 
@@ -241,13 +222,16 @@ public class PhotosFragment extends Fragment{
 
     private void clearAdapterDataSet()
     {
-        mItemsData.clear();
-        mListAdapter.swap(mItemsData);
+        if(mItemsData != null && mListAdapter != null)
+        {
+            mItemsData.clear();
+            mListAdapter.swap(mItemsData);
+        }
     }
 
     private void updateAdapterDataSet(ArrayList<PhotoVo> photosList)
     {
-        if(photosList != null)
+        if(photosList != null && mItemsData != null && mListAdapter != null)
         {
             mItemsData.addAll(photosList);
             mListAdapter.swap (mItemsData);

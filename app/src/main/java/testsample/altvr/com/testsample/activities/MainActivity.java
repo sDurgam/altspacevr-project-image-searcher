@@ -4,7 +4,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,7 +14,7 @@ import android.support.v7.widget.SearchView ;
 import org.greenrobot.eventbus.EventBus;
 
 import testsample.altvr.com.testsample.R;
-import testsample.altvr.com.testsample.events.SearchEvent;
+import testsample.altvr.com.testsample.events.SearchPhotosEvent;
 import testsample.altvr.com.testsample.fragments.PhotosFragment;
 import testsample.altvr.com.testsample.service.ApiService;
 import testsample.altvr.com.testsample.util.LogUtil;
@@ -81,8 +80,8 @@ public class MainActivity extends AppCompatActivity
             mSearchView.clearFocus();
             //filter results based on the search request
             //clearphotos in the fragment
-            SearchEvent searchEvent = new SearchEvent(query);
-            mEventBus.post(searchEvent);
+            SearchPhotosEvent searchPhotosEvent = new SearchPhotosEvent(query);
+            mEventBus.post(searchPhotosEvent);
             return true;
         }
 
@@ -94,8 +93,8 @@ public class MainActivity extends AppCompatActivity
         public boolean onClose()
         {
             mSearchView.onActionViewCollapsed();
-            SearchEvent searchEvent = new SearchEvent(null);
-            mEventBus.post(searchEvent);
+            SearchPhotosEvent searchPhotosEvent = new SearchPhotosEvent(null);
+            mEventBus.post(searchPhotosEvent);
             return false;
         }
     };
