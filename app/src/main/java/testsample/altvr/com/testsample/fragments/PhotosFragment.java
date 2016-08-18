@@ -1,6 +1,7 @@
 package testsample.altvr.com.testsample.fragments;
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,6 +23,7 @@ import testsample.altvr.com.testsample.R;
 import testsample.altvr.com.testsample.adapter.ItemsListAdapter;
 import testsample.altvr.com.testsample.events.ApiErrorEvent;
 import testsample.altvr.com.testsample.events.PhotosEvent;
+import testsample.altvr.com.testsample.events.SearchEvent;
 import testsample.altvr.com.testsample.listeners.RecyclerViewScrollListener;
 import testsample.altvr.com.testsample.service.ApiService;
 import testsample.altvr.com.testsample.util.DatabaseUtil;
@@ -37,7 +39,7 @@ public class PhotosFragment extends Fragment{
     private ArrayList<PhotoVo> mItemsData = new ArrayList<>();
     private ItemsListAdapter mListAdapter;
     private DatabaseUtil mDatabaseUtil;
-
+    private String searchQuery = null;   //to distinguish between search photos and getdefault photos
 
     public static PhotosFragment newInstance()
     {
@@ -84,7 +86,14 @@ public class PhotosFragment extends Fragment{
             public void onLoadMore(int page, int totalItemsCount)
             {
                 LogUtil.log( "current page:" + page + ",total items count:" + totalItemsCount);
-                getMoreDefaultPhotos(page);
+                if(searchQuery == null)
+                {
+                    getMoreDefaultPhotos(page);
+                }
+                else
+                {
+                    getMoresearchPhotos(page);
+                }
             }
         });
 
@@ -129,6 +138,24 @@ public class PhotosFragment extends Fragment{
         mListAdapter = null;
     }
 
+    //Event to switch between default mode and search mode
+    @Subscribe
+    public void onEvent(SearchEvent event)
+    {
+        String query = ((SearchEvent)event).query;
+        if(query == null)
+        {
+            searchQuery = null;
+            getDefaultPhotos();
+        }
+        else if(searchQuery == null || (!searchQuery.equals(query)))
+        {
+            searchQuery = query;
+            searchPhotos(query, 1);
+        }
+    }
+
+
     @Subscribe
     public void onEvent(PhotosEvent event)
     {
@@ -144,9 +171,7 @@ public class PhotosFragment extends Fragment{
          */
         fetchingItems.setVisibility(View.GONE);
         LogUtil.log("photos fetch success event");
-        //mItemsData.clear();
-        mItemsData.addAll((ArrayList<PhotoVo>)event.data);
-        mListAdapter.swap (mItemsData);
+        updateAdapterDataSet((ArrayList<PhotoVo>)event.data);
     }
 
     @Subscribe
@@ -164,6 +189,7 @@ public class PhotosFragment extends Fragment{
     //get photos from the first page
     private void getDefaultPhotos()
     {
+        clearAdapterDataSet(); //for the first time
         //get total count and store it in db
         mService.getDefaultPhotos(1);
     }
@@ -173,5 +199,31 @@ public class PhotosFragment extends Fragment{
         mService.getDefaultPhotos(pagenumber + 1);
     }
 
+    public void searchPhotos(String query, int pagenumber)
+    {
+        clearAdapterDataSet(); //clear the data
+        fetchingItems.setVisibility(View.VISIBLE);
+        mService.searchPhotos(query, pagenumber);
+    }
+
+    private void getMoresearchPhotos(int pagenumber)
+    {
+        mService.searchPhotos(searchQuery, pagenumber + 1);
+    }
+
+    public void clearAdapterDataSet()
+    {
+        mItemsData.clear();
+        mListAdapter.swap(mItemsData);
+    }
+
+    public void updateAdapterDataSet(ArrayList<PhotoVo> photosList)
+    {
+        if(photosList != null)
+        {
+            mItemsData.addAll(photosList);
+            mListAdapter.swap (mItemsData);
+        }
+    }
 }
 

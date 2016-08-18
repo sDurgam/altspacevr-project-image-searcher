@@ -60,30 +60,9 @@ public class ApiService
             public void success(PhotoResponseVo photoResponseVo, Response response)
             {
                 LogUtil.log(mContext.getResources().getString(R.string.getdefaultphotos_success_str));
-                int totalphotoscount = (int) (Math.ceil(pagenumber) * Constants.photosperpageCount);
-                if (photoResponseVo != null && photoResponseVo.hits != null) //check if response is empty or not
-                {
-                    if (photoResponseVo.total > totalphotoscount)   //check to see if you have any photos to load
-                    {
-                        List<PhotoVo> photosList = (List<PhotoVo>) photoResponseVo.hits;
-                        PhotosEvent photosevent = new PhotosEvent(photosList);
-                        mEventBus.post(photosevent);
-                    }
-                    else if (photoResponseVo.total == totalphotoscount)   //check to see if you have any photos to load
-                    {
-                        LogUtil.log(mContext.getResources().getString(R.string.nomorephotosstring));
-                    }
-                    else
-                    {
-                        //clear and whole list
-                    }
-                }
-                else
-                {
-                    LogUtil.log(mContext.getResources().getString(R.string.getdefaultphotos_noresponsestr));
-                }
+                String noresponsestr = mContext.getResources().getString(R.string.getdefaultphotos_noresponsestr);
+                getphotosSuccessHandler(photoResponseVo, response, pagenumber, noresponsestr);
             }
-
             @Override
             public void failure(RetrofitError error)
             {
@@ -92,4 +71,59 @@ public class ApiService
             }
         });
     }
+
+    public void searchPhotos(final String searchString, final int pagenumber)
+    {
+        mService.searchPhotos(RetrofitAdapter.getAPIKey(), searchString, 0, 0, Constants.photoTag, pagenumber, new Callback<PhotoResponseVo>()
+        {
+            @Override
+            public void success(PhotoResponseVo photoResponseVo, Response response)
+            {
+                LogUtil.log(mContext.getResources().getString(R.string.getsearchphotos_success_str) + searchString);
+                String noresponsestr = mContext.getResources().getString(R.string.getsearchphotos_noresponsestr) + searchString;
+                getphotosSuccessHandler(photoResponseVo, response, pagenumber, noresponsestr);
+            }
+
+            @Override
+            public void failure(RetrofitError error)
+            {
+                LogUtil.log(mContext.getResources().getString(R.string.getsearchphotos_errorstr));
+                mEventBus.post(new ApiErrorEvent(error.toString()));
+            }
+        });
+    }
+
+    //send photos list to the fragment
+    private void getphotosSuccessHandler(PhotoResponseVo photoResponseVo, Response response, int pagenumber, String noresponsemsg)
+    {
+        int totalphotoscount = (int) (Math.ceil(pagenumber) * Constants.photosperpageCount);
+        if (photoResponseVo != null && photoResponseVo.hits != null) //check if response is empty or not
+        {
+            if (photoResponseVo.total > totalphotoscount)   //check to see if you have any photos to load
+            {
+                List<PhotoVo> photosList = (List<PhotoVo>) photoResponseVo.hits;
+                PhotosEvent photosevent = new PhotosEvent(photosList);
+                mEventBus.post(photosevent);
+            }
+            else if (photoResponseVo.total == totalphotoscount)   //check to see if you have any photos to load
+            {
+                LogUtil.log(noresponsemsg);
+            }
+            else
+            {
+                //clear and whole list
+            }
+        }
+        else
+        {
+
+        }
+    }
+
+    private void getphotosEmptyHandler(String message)
+    {
+
+    }
+
+
 }

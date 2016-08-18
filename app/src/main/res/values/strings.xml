@@ -18,5 +18,9 @@
     <string name="nomorephotosstring">No more photos to load</string>
     <string name="getdefaultphotos_errorstr">Failed to fetch default photos"</string>
     <string name="getdefaultphotos_success_str">"Successfully fetched default photos"</string>
-    <string name="getdefaultphotos_noresponsestr">"Successfully fetched default photos"</string>
+    <string name="getdefaultphotos_noresponsestr">"default photos list is empty"</string>
+
+    <string name="getsearchphotos_errorstr">Failed to fetch photos for the search string:"</string>
+    <string name="getsearchphotos_success_str">"Successfully fetched photos for the search string:"</string>
+    <string name="getsearchphotos_noresponsestr">"photos list is empty for the search string:"</string>
 </resources>

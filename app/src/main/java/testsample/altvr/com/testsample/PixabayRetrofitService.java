@@ -13,6 +13,6 @@ public interface PixabayRetrofitService {
     void getDefaultPhotos(@Query("key") String key, @Query("min_width") int minWidth, @Query("min_height") int minHeight, @Query("image_type") String imageType, @Query("page") int page, Callback<PhotoResponseVo> callback);
 
     @GET("/api")
-    void searchPhotos(@Query("key") String key, @Query("q") String searchString, @Query("min_width") int minWidth, @Query("min_height") int minHeight, @Query("image_type") String imageType, Callback<PhotoResponseVo> callback);
+    void searchPhotos(@Query("key") String key, @Query("q") String searchString, @Query("min_width") int minWidth, @Query("min_height") int minHeight, @Query("image_type") String imageType, @Query("page") int page, Callback<PhotoResponseVo> callback);
 
 }

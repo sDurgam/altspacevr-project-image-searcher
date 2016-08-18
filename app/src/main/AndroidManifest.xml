@@ -21,4 +21,8 @@
                 android:resource="@xml/searchable" />
         </activity>
     </application>
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:label="Tests for my packaged app"
+        android:targetPackage="testsample.altvr.com.testsample.test" />
 </manifest>
