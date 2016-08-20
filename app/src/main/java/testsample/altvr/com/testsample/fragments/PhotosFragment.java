@@ -1,10 +1,14 @@
 package testsample.altvr.com.testsample.fragments;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import testsample.altvr.com.testsample.R;
 import testsample.altvr.com.testsample.adapter.ItemsListAdapter;
@@ -22,8 +27,10 @@ import testsample.altvr.com.testsample.events.PhotosEvent;
 import testsample.altvr.com.testsample.events.SearchPhotosEvent;
 import testsample.altvr.com.testsample.listeners.RecyclerViewScrollListener;
 import testsample.altvr.com.testsample.service.ApiService;
+import testsample.altvr.com.testsample.util.DatabaseBitmapUtil;
 import testsample.altvr.com.testsample.util.DatabaseUtil;
 import testsample.altvr.com.testsample.util.LogUtil;
+import testsample.altvr.com.testsample.vo.PhotoDBVo;
 import testsample.altvr.com.testsample.vo.PhotoVo;
 
 public class PhotosFragment extends Fragment{
@@ -37,6 +44,9 @@ public class PhotosFragment extends Fragment{
     private ItemsListAdapter mListAdapter;
     private DatabaseUtil mDatabaseUtil;
     private String searchQuery = null;   //to distinguish between search photos and getdefault photos
+
+    //list of photo ids in database
+    List<String> photoIDsList;
 
     public static PhotosFragment newInstance()
     {
@@ -57,6 +67,7 @@ public class PhotosFragment extends Fragment{
         super.onActivityCreated(savedInstanceState);
         mService = new ApiService(getActivity());
         mDatabaseUtil = new DatabaseUtil(getActivity());
+        photoIDsList = new ArrayList<>();
         setupViews();
     }
 
@@ -105,7 +116,29 @@ public class PhotosFragment extends Fragment{
         @Override
         public void itemClicked(ItemsListAdapter.ItemViewHolder rowView, int position)
         {
-
+            String saveStatus = rowView.saveText.getText().toString();
+            String unsavestr = getContext().getResources().getString(R.string.unsave);
+            String savestr = getContext().getResources().getString(R.string.save);
+            if(saveStatus.equals(savestr))  //request to save in db
+            {
+                rowView.itemImage.buildDrawingCache();
+                byte[] imageArray = DatabaseBitmapUtil.getBytes(rowView.itemImage.getDrawingCache());
+                PhotoDBVo photoObj = new PhotoDBVo(rowView.itemImage.getTag().toString(), imageArray, rowView.itemName.getText().toString());
+                mDatabaseUtil.insertImage(photoObj);
+                rowView.saveText.setText(unsavestr);    //save if db returns a success message
+            }
+            else
+            {
+                //rowView.itemImage.setImageDrawable(getResources().getDrawable(R.drawable.example_space_image));
+//                PhotoDBVo photo = mDatabaseUtil.getImage(rowView.itemImage.getTag().toString());
+//                String tags = photo.getTags();
+//                Bitmap bitmap = DatabaseBitmapUtil.getImage(photo.getPhoto());
+                boolean isdeleted = mDatabaseUtil.deleteImage(rowView.itemImage.getTag().toString());
+                if(isdeleted)
+                {
+                    rowView.saveText.setText(savestr);  //save if db returns a success message
+                }
+            }
         }
     }
 
@@ -118,7 +151,7 @@ public class PhotosFragment extends Fragment{
         {
             EventBus.getDefault().register(this);
         }
-        getDefaultPhotos();
+        getDefaultPhotos(); //api call
     }
 
     @Override

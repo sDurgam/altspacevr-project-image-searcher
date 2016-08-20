@@ -1,5 +1,6 @@
 package testsample.altvr.com.testsample.adapter;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,11 +30,11 @@ import testsample.altvr.com.testsample.util.ItemImageTransformation;
 import testsample.altvr.com.testsample.util.LogUtil;
 import testsample.altvr.com.testsample.vo.PhotoVo;
 
-public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+{
     private LogUtil log = new LogUtil(ItemsListAdapter.class);
     public static final int TYPE_HEADER = 1;
     public static final int TYPE_ITEM = 0;
-
     private static final int INVALID_DIMEN = -1;
 
     private final ItemListener mListener;
@@ -40,12 +42,17 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private List<PhotoVo> mItems;
     private Context mContext;
     private DatabaseUtil mDbUtil;
+    private List<String> mImageIdsList;  //list of images in DB
+    String mSavedText;
 
-    public interface ItemListener {
+
+    public interface ItemListener
+    {
         void itemClicked(ItemViewHolder rowView, int position);
     }
 
-    public ItemsListAdapter(List<PhotoVo> items, ItemListener listener, int imageWidth, Context context) {
+    public ItemsListAdapter(List<PhotoVo> items, ItemListener listener, int imageWidth, Context context)
+    {
         //mItems = items;
         mItems = new ArrayList<>();
         mItems.addAll(items);
@@ -53,6 +60,8 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         mImageWidth = imageWidth;
         mContext = context;
         mDbUtil = new DatabaseUtil(mContext);
+        mSavedText = mContext.getResources().getString(R.string.unsave);
+        mImageIdsList = getPhotosFromDB();
     }
 
     @Override
@@ -63,7 +72,8 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position)
+    {
       	/*
          * YOUR CODE HERE
          *
@@ -75,11 +85,18 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
          */
         ItemViewHolder itemholder = (ItemViewHolder) holder;
         PhotoVo photo = mItems.get(position);
-        ((ItemViewHolder) holder).itemName.setText(photo.tags);
+        itemholder.itemName.setText(photo.tags);
+        itemholder.itemImage.setTag(photo.id);
+        if(mImageIdsList.contains(photo.id))
+        {
+            itemholder.saveText.setText(mSavedText);
+        }
+        itemholder.saveText.setTag(itemholder);
         Picasso.with(mContext).load(photo.webformatURL)
                 .placeholder(android.R.drawable.progress_horizontal)
                 .transform(new ItemImageTransformation(mImageWidth))
-                .into(itemholder.itemImage, new Callback() {
+                .into(itemholder.itemImage, new Callback()
+                {
                     @Override
                     public void onSuccess() {
                         LogUtil.log("Success loading the image");
@@ -91,6 +108,17 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         LogUtil.log("Error loading the image");
                     }
                 });
+            itemholder.saveText.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    if(view.getTag() instanceof  ItemViewHolder)
+                    {
+                        mListener.itemClicked((ItemViewHolder) view.getTag(), position);    //set a click listener for save buton
+                    }
+                }
+            });
     }
 
     @Override
@@ -106,7 +134,8 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return mItems.size();
     }
 
@@ -115,7 +144,8 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         public TextView itemName;
         public TextView saveText;
 
-        public ItemViewHolder(View itemView) {
+        public ItemViewHolder(View itemView)
+        {
             super(itemView);
             itemName = (TextView) itemView.findViewById(R.id.itemName);
             itemImage = (ImageView) itemView.findViewById(R.id.itemImage);
@@ -132,5 +162,10 @@ public class ItemsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
         mItems.addAll(photoVoList);
         notifyDataSetChanged();
+    }
+
+    private List<String> getPhotosFromDB()
+    {
+        return mDbUtil.getImagesId();
     }
 }
