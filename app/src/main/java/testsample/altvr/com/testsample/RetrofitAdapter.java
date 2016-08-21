@@ -16,8 +16,8 @@ public class RetrofitAdapter {
     private static LogUtil log = new LogUtil(RetrofitAdapter.class.getSimpleName());
 
     private static String API_ENDPOINT_URL = "https://pixabay.com";
-    //private static String API_KEY = "2387134-2e9952af7d840c1d7abc947b1";
-    private static String API_KEY = "3112591-bec1ed069a685e8eaceac43ec";
+    private static String API_KEY = "2387134-2e9952af7d840c1d7abc947b1";
+    //private static String API_KEY = "3112591-bec1ed069a685e8eaceac43ec";
 
     public static PixabayRetrofitService getRestService(Context context) {
         JacksonConverter converter = new JacksonConverter();

@@ -11,16 +11,38 @@
     <string name="search_hint">Search hint..</string>
     <string name="no_results_found">No results found, try another search</string>
     <string name="tags">Tags:\u0020 </string>
+    <string name="saveimage_error">Failed to save the image</string>
     <string name="saved">Saved</string>
     <string name="unsaved">Unsaved</string>
     <string name="save">Save</string>
     <string name="unsave">Unsave</string>
+    <string name="photo">photo</string>
     <string name="nomorephotosstring">No more photos to load</string>
-    <string name="getdefaultphotos_errorstr">Failed to fetch default photos"</string>
-    <string name="getdefaultphotos_success_str">Successfully fetched default photos</string>
-    <string name="getdefaultphotos_noresponsestr">No photos found</string>
+    <!-- Popular or default Strings -->
+    <string name="popular">popular</string>
+    <string name="getpopularphotos_error">Failed to fetch popular photos"</string>
+    <string name="getpopularphotos_success">Successfully fetched popular photos</string>
+    <string name="getpopularphotos_noresponse">No popular photos found</string>
+    <string name="getsearchpopularphotos_error">Failed to fetch popular photos for the search string"</string>
+    <string name="getsearchpopularphotos_success">"Successfully fetched popular photos for the search string"</string>
+    <string name="getsearchpopularphotos_noresponse">No results found, try another search</string>
 
-    <string name="getsearchphotos_errorstr">Failed to fetch photos for the search string"</string>
-    <string name="getsearchphotos_success_str">"Successfully fetched photos for the search string"</string>
-    <string name="getsearchphotos_noresponsestr">No results found, try another search</string>
+    <!--Latest Photos Strings-->
+    <string name="latest">latest</string>
+    <string name="getlatestphotos_error">Failed to fetch latest photos"</string>
+    <string name="getlatestphotos_success">Successfully fetched latest photos</string>
+    <string name="getlatestphotos_noresponse">No latest photos found</string>
+    <string name="getsearchlatestphotos_error">Failed to fetch latest photos for the search string"</string>
+    <string name="getsearchlatestphotos_success">"Successfully fetched latest photos for the search string"</string>
+    <string name="getsearchlatestphotos_noresponse">No results found, try another search</string>
+
+    <!--EditorsChoice Photos Strings-->
+    <string name="editorschoice">Editors choice</string>
+    <string name="geteditorschoicephotos_error">Failed to fetch editors_choice photos"</string>
+    <string name="geteditorschoicephotos_success">Successfully fetched editors_choice photos</string>
+    <string name="geteditorschoicephotos_noresponse">No editors_choice photos found</string>
+    <string name="getsearcheditorschoicephotos_error">Failed to fetch editors_choice photos for the search string"</string>
+    <string name="getsearcheditorschoice_success">"Successfully fetched editors_choice photos for the search string"</string>
+    <string name="getsearcheditorschoice_noresponse">No results found, try another search</string>
+
 </resources>

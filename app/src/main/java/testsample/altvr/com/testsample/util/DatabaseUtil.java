@@ -66,21 +66,70 @@ public class DatabaseUtil extends SQLiteOpenHelper {
      * For part 1b, you should fill in the various CRUD operations below to manipulate the db
      * returned by getWritableDatabase() to store/load photos.
      */
+    public List<PhotoDBVo> getImagesBySearchStr(String query)
+    {
+        List<PhotoDBVo> imagesList = new ArrayList<>();
+        PhotoDBVo photo;
+        String[] columns = new String[] {KEY_PHOTO_ID, KEY_PHOTO, KEY_PHOTO_TAGS};
+        String whereClause = KEY_PHOTO_TAGS + " LIKE ?";
+        String[] whereArgs =  new String[] {"%" + query + "%"};
+        Cursor cursor = mDb.query(TABLE_PHOTOS, columns, whereClause, whereArgs, null, null, null);
+        if(cursor.getCount() > 0)
+        {
+            cursor.moveToFirst();
+            do
+            {
+                photo = new PhotoDBVo();
+                photo.setId(cursor.getString(0));
+                photo.setPhoto(cursor.getBlob(1));
+                photo.setTags(cursor.getString(2));
+                imagesList.add(photo);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+          return imagesList;
+    }
+
+    public List<PhotoDBVo> getAllImages()
+    {
+        List<PhotoDBVo> imagesList = new ArrayList<>();
+        PhotoDBVo photo;
+        String[] columns = new String[] { KEY_PHOTO_ID, KEY_PHOTO, KEY_PHOTO_TAGS};
+        Cursor cursor = mDb.query(TABLE_PHOTOS, columns, null, null, null, null, null);
+        if(cursor.getCount() > 0)
+        {
+            cursor.moveToFirst();
+            do {
+                photo = new PhotoDBVo();
+                photo.setId(cursor.getString(0));
+                photo.setPhoto(cursor.getBlob(1));
+                photo.setTags(cursor.getString(2));
+                imagesList.add(photo);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return imagesList;
+    }
+
+    //get image Ids of all images
     public List<String> getImagesId()
     {
         List<String> imagesIdList = new ArrayList<>();
         String[] columns = new String[] { KEY_PHOTO_ID};
         Cursor cursor = mDb.query(TABLE_PHOTOS, columns, null, null, null, null, null);
-        cursor.moveToFirst();
-        do
+        if(cursor.getCount() > 0)
         {
-            imagesIdList.add(cursor.getString(0));
-        }while(cursor.moveToNext());
-        cursor.close();
+            cursor.moveToFirst();
+            do
+            {
+                imagesIdList.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
         return imagesIdList;
     }
 
-
+    //get image by Id
     public PhotoDBVo getImage(String id)
     {
         PhotoDBVo photoObj = null;
