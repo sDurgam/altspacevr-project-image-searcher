@@ -44,5 +44,6 @@
     <string name="getsearcheditorschoicephotos_error">Failed to fetch editors_choice photos for the search string"</string>
     <string name="getsearcheditorschoice_success">"Successfully fetched editors_choice photos for the search string"</string>
     <string name="getsearcheditorschoice_noresponse">No results found, try another search</string>
+    <string name="pixabayurl">https://pixabay.com/</string>
 
 </resources>

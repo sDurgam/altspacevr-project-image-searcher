@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +31,9 @@ import testsample.altvr.com.testsample.vo.PhotoVo;
 public class ItemsSavedListAdapter extends ItemsBaseAdapter
 {
     private List<PhotoDBVo> mItems;
-    private Context mContext;
     private DatabaseUtil mDbUtil;
 
-    public ItemsSavedListAdapter(List<PhotoDBVo> items, ItemListener listener, int imageWidth, Context context)
+    public ItemsSavedListAdapter(List<PhotoDBVo> items, ItemListener listener, int imageWidth, WeakReference<Context> context)
     {
         //mItems = items;
         super(listener, imageWidth, context);
@@ -70,7 +70,7 @@ public class ItemsSavedListAdapter extends ItemsBaseAdapter
             {
                 if(view.getTag() instanceof  ItemViewHolder)
                 {
-                    mListener.itemClicked((ItemViewHolder) view.getTag(), position);    //set a click listener for save buton
+                    mListener.itemClicked((ItemViewHolder) view.getTag(), position, new WeakReference<Context>(mContext));    //set a click listener for save buton
                 }
             }
         });

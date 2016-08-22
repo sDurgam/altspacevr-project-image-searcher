@@ -1,6 +1,10 @@
 package testsample.altvr.com.testsample.fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -9,15 +13,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import testsample.altvr.com.testsample.R;
+import testsample.altvr.com.testsample.activities.MainActivity;
 import testsample.altvr.com.testsample.adapter.ItemsBaseAdapter;
 import testsample.altvr.com.testsample.adapter.ItemsListAdapter;
 import testsample.altvr.com.testsample.events.ApiErrorEvent;
@@ -47,6 +54,9 @@ public class PhotosFragment extends Fragment
     protected LinearLayoutManager mLinearLayoutManager;
     //list of photo ids in database
     List<String> photoIDsList;
+    ItemsBaseAdapter.ItemListener listener;
+    //Context mContext;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -72,6 +82,14 @@ public class PhotosFragment extends Fragment
         itemsListRecyclerView = (RecyclerView) view.findViewById(R.id.photosListRecyclerView);
     }
 
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
+        //mContext = context;
+
+    }
+
     private void setupViews()
     {
         fetchingItems.setVisibility(View.VISIBLE);
@@ -81,42 +99,53 @@ public class PhotosFragment extends Fragment
 
     protected void setupItemsList()
     {
-        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mLinearLayoutManager = new LinearLayoutManager(getContext());
         itemsListRecyclerView.setHasFixedSize(true);
         itemsListRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mListAdapter = new ItemsListAdapter(new ArrayList<PhotoVo>(), new ItemClickedListener(), getResources().getDisplayMetrics().widthPixels, getContext());
+        mListAdapter = new ItemsListAdapter(new ArrayList<PhotoVo>(), getListener(), getResources().getDisplayMetrics().widthPixels, new WeakReference<Context>(getContext()));
         itemsListRecyclerView.setAdapter(mListAdapter);
     }
 
-    protected class ItemClickedListener implements ItemsBaseAdapter.ItemListener
+    public ItemsBaseAdapter.ItemListener getListener()
     {
+        if(listener == null) {
+            listener = new ItemClickedListener();
+        }
+        return listener;
+    }
 
+    public class ItemClickedListener implements ItemsBaseAdapter.ItemListener
+    {
         @Override
-        public void itemClicked(ItemsBaseAdapter.ItemViewHolder rowView, int position)
+        public void itemClicked(ItemsBaseAdapter.ItemViewHolder rowView, int position, WeakReference<Context> ctx)
         {
-            String saveStatus = rowView.saveText.getText().toString();
-            String unsavestr = getContext().getResources().getString(R.string.unsave);
-            String savestr = getContext().getResources().getString(R.string.save);
-            String id = rowView.itemImage.getTag() != null ? rowView.itemImage.getTag().toString() : null;
-            String tag = rowView.itemName.getText().toString();
-            PhotoDBVo photoObj;
-            if(saveStatus.equals(savestr))  //request to save in db
+        String saveStatus = rowView.saveText.getText().toString();
+        String unsavestr = ctx.get().getResources().getString(R.string.unsave);
+        String savestr = ctx.get().getResources().getString(R.string.save);
+        String id = rowView.itemImage.getTag() != null ? rowView.itemImage.getTag().toString() : null;
+        String tag = rowView.itemName.getText().toString();
+            if(mDatabaseUtil == null)
             {
-                rowView.itemImage.buildDrawingCache();
-                Bitmap bitmap = (rowView.itemImage.getDrawingCache());
-                if(bitmap != null)
-                {
-                    byte[] imageArray = DatabaseBitmapUtil.getBytes(bitmap);
-                    photoObj = new PhotoDBVo(id, imageArray, tag);
-                    mDatabaseUtil.insertImage(photoObj);
-                    rowView.saveText.setText(unsavestr);    //save if db returns a success message
-                    EventBus.getDefault().post(new UpdateSavedEvent()); //refresh all fragments
-                }
-                else
-                {
-                    displaySnackBar(getContext().getResources().getString(R.string.saveimage_error));
-                }
+                mDatabaseUtil = new DatabaseUtil(ctx.get());
             }
+        PhotoDBVo photoObj;
+        if(saveStatus.equals(savestr))  //request to save in db
+        {
+            rowView.itemImage.buildDrawingCache();
+            Bitmap bitmap = (rowView.itemImage.getDrawingCache());
+            if(bitmap != null)
+            {
+                byte[] imageArray = DatabaseBitmapUtil.getBytes(bitmap);
+                photoObj = new PhotoDBVo(id, imageArray, tag);
+                mDatabaseUtil.insertImage(photoObj);
+                rowView.saveText.setText(unsavestr);    //save if db returns a success message
+                EventBus.getDefault().post(new UpdateSavedEvent()); //refresh all fragments
+            }
+            else
+            {
+                displaySnackBar(ctx.get().getResources().getString(R.string.saveimage_error));
+            }
+        }
             else
             {
                 boolean isdeleted = mDatabaseUtil.deleteImage(rowView.itemImage.getTag().toString());

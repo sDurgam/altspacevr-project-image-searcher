@@ -12,7 +12,7 @@
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,8 +22,8 @@
                 android:resource="@xml/searchable" />
         </activity>
     </application>
-    <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
-        android:label="Tests for my packaged app"
-        android:targetPackage="testsample.altvr.com.testsample.test" />
+    <!--<instrumentation-->
+        <!--android:name="android.test.InstrumentationTestRunner"-->
+        <!--android:label="Tests for my packaged app"-->
+        <!--android:targetPackage="testsample.altvr.com.testsample.test" />-->
 </manifest>

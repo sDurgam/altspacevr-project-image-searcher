@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,14 +41,14 @@ public abstract class ItemsBaseAdapter  extends RecyclerView.Adapter<RecyclerVie
 
     public interface ItemListener
     {
-        void itemClicked(ItemViewHolder rowView, int position);
+        void itemClicked(ItemViewHolder rowView, int position, WeakReference<Context> ctx);
     }
 
-    public ItemsBaseAdapter(ItemListener listener, int imageWidth, Context context)
+    public ItemsBaseAdapter(ItemListener listener, int imageWidth, WeakReference<Context> context)
     {
         mListener = listener;
         mImageWidth = imageWidth;
-        mContext = context;
+        mContext = context.get();
         mDbUtil = new DatabaseUtil(mContext);
         mSavedText = mContext.getResources().getString(R.string.unsave);
         mSaveText = mContext.getResources().getString(R.string.save);

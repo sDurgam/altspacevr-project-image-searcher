@@ -2,7 +2,10 @@ package testsample.altvr.com.testsample.activities;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -13,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.SearchView ;
+import android.view.View;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -40,7 +44,7 @@ public class MainActivity extends AppCompatActivity
     EventBus mEventBus; //to communicate with fragment about searchview
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -57,6 +61,16 @@ public class MainActivity extends AppCompatActivity
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchMenuItem = menu.findItem(R.id.search);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(getResources().getString(R.string.pixabayurl)));
+                startActivity(i);
+            }
+        });
         mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
         mSearchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
@@ -101,7 +115,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if(mSearchView != null)
                 {
-                    mSearchView.onActionViewCollapsed();
+                    closeSearchView();
                 }
             }
 
@@ -139,9 +153,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public boolean onClose()
         {
-            mSearchView.onActionViewCollapsed();
-            SearchPhotosEvent searchPhotosEvent = new SearchPhotosEvent(null, getCurrentPageType());
-            mEventBus.post(searchPhotosEvent);
+            closeSearchView();
             return false;
         }
     };
@@ -149,6 +161,13 @@ public class MainActivity extends AppCompatActivity
     String getCurrentPageType()
     {
         return tabTitles[mTabLayout.getSelectedTabPosition()];
+    }
+
+    void closeSearchView()
+    {
+        mSearchView.onActionViewCollapsed();
+        SearchPhotosEvent searchPhotosEvent = new SearchPhotosEvent(null, getCurrentPageType());
+        mEventBus.post(searchPhotosEvent);
     }
 
 //    private void displayFragment(Fragment fragment, int title) {

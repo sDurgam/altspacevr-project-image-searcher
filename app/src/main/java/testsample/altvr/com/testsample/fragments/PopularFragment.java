@@ -1,14 +1,10 @@
 package testsample.altvr.com.testsample.fragments;
 
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
@@ -17,8 +13,6 @@ import testsample.altvr.com.testsample.R;
 import testsample.altvr.com.testsample.events.PhotosEvent;
 import testsample.altvr.com.testsample.events.SearchPhotosEvent;
 import testsample.altvr.com.testsample.listeners.RecyclerViewScrollListener;
-import testsample.altvr.com.testsample.service.ApiService;
-import testsample.altvr.com.testsample.util.DatabaseUtil;
 import testsample.altvr.com.testsample.util.LogUtil;
 import testsample.altvr.com.testsample.vo.PhotoVo;
 

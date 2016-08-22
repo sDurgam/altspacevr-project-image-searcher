@@ -1,5 +1,6 @@
 package testsample.altvr.com.testsample.fragments;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +72,7 @@ public class SavedFragment extends PhotosFragment
         mLinearLayoutManager = new LinearLayoutManager(getActivity());
         itemsListRecyclerView.setHasFixedSize(true);
         itemsListRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mDBListAdapter = new ItemsSavedListAdapter(mItemsDBData, new ItemClickedListener(), getResources().getDisplayMetrics().widthPixels, getContext());
+        mDBListAdapter = new ItemsSavedListAdapter(mItemsDBData, new ItemClickedListener(), getResources().getDisplayMetrics().widthPixels, new WeakReference<Context>(getContext()));
         itemsListRecyclerView.setAdapter(mDBListAdapter);
         itemsListRecyclerView.setOnScrollListener(new RecyclerViewScrollListener(getContext(), mLinearLayoutManager)
         {
@@ -86,11 +88,11 @@ public class SavedFragment extends PhotosFragment
     {
 
         @Override
-        public void itemClicked(ItemsBaseAdapter.ItemViewHolder rowView, int position)
+        public void itemClicked(ItemsBaseAdapter.ItemViewHolder rowView, int position, WeakReference<Context> ctx)
         {
             String saveStatus = rowView.saveText.getText().toString();
-            String unsavestr = getContext().getResources().getString(R.string.unsave);
-            String savestr = getContext().getResources().getString(R.string.save);
+            String unsavestr = ctx.get().getResources().getString(R.string.unsave);
+            String savestr = ctx.get().getResources().getString(R.string.save);
             String id = rowView.itemImage.getTag() != null ? rowView.itemImage.getTag().toString() : null;
             String tag = rowView.itemName.getText().toString();
             PhotoDBVo photoObj;
@@ -108,7 +110,7 @@ public class SavedFragment extends PhotosFragment
                 }
                 else
                 {
-                    displaySnackBar(getContext().getResources().getString(R.string.saveimage_error));
+                    displaySnackBar(ctx.get().getResources().getString(R.string.saveimage_error));
                 }
             }
             else

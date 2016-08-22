@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class ItemsListAdapter extends ItemsBaseAdapter
     private List<PhotoVo> mItems;
     private List<String> mImageIdsList;  //list of images in DB
 
-    public ItemsListAdapter(List<PhotoVo> items, ItemListener listener, int imageWidth, Context context)
+    public ItemsListAdapter(List<PhotoVo> items, ItemListener listener, int imageWidth, WeakReference<Context> context)
     {
         super(listener, imageWidth, context);
         log = new LogUtil(ItemsBaseAdapter.class);
@@ -61,6 +62,7 @@ public class ItemsListAdapter extends ItemsBaseAdapter
         PhotoVo photo = mItems.get(position);
         itemholder.itemName.setText(photo.tags);
         itemholder.itemImage.setTag(photo.id);
+        //itemholder.itemImage.buildDrawingCache(true);
         if(mImageIdsList.contains(photo.id))
         {
             itemholder.saveText.setText(mSavedText);
@@ -94,7 +96,7 @@ public class ItemsListAdapter extends ItemsBaseAdapter
                 {
                     if(view.getTag() instanceof  ItemViewHolder)
                     {
-                        mListener.itemClicked((ItemViewHolder) view.getTag(), position);    //set a click listener for save buton
+                        mListener.itemClicked((ItemViewHolder) view.getTag(), position, new WeakReference<Context>(mContext));    //set a click listener for save buton
                     }
                 }
             });
