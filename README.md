@@ -1,83 +1,65 @@
 # AltspaceVR Programming Project - Android Image Searcher
 
-## Instructions
+Image Searcher Android app fetches and displays different images using [Pixabay image API][pixabay].
 
-Finish the implementation of an Android app that can be used to search for and save images from the [Pixabay image API][pixabay].
+## Features
+Displays popular, latest, saved and editors choice sections 
 
-## Goals
+  * Support for browsing images in each section
+   
+  * Support for browsing different sections using scrollable tabs
+   
+  * Support for saving or deleting images displayed in each section for offline browsing by clicking on Save/Unsave option on the image
+   
+  * Support to browse more images as by scrolling down the images each section
+   
+  * Support for searching images by tags in each section
 
-We use this test to get a sense of your coding style and to how you creatively solve both a concrete problem and an abstract one. When we receive your project, here is what we will be asking ourselves:
+## Functionality
 
-- Does the app allow browsing and searching of images fetched from the API?
+* Implemented view pager and tab layout in the MainActivity. Popular, latest, saved and editors choice sections are displayed as tabs and each tab can be browsed using the view pager
+ 
+* Created `PopularFragment`, `LatestFragment`, `SavedFragment` and `EditorsChoiceFragment`. These fragments extend PhotoFragment fragment. Functionality to browse relevant images and search by tags is implemented in each of these fragments.
+ 
+* Implemented `itemsListRecyclerView.setOnScrollListener()` in every fragment. This method fetches relevant images by passing page number as an argument to Pixabay image API as user scrolls down the images displayed in each section.
+ 
+* Created `SearchPhotosEvent` event with query and type as arguments. query can be a string to search or null. type is 'popular', 'latest', 'save' or 'editorschoice. Main Activity posts SearchPhotosEvent when user submits query in the SearchView in any section or when user closes the SearchView. PopularFragment, LatestFragment, SavedFragment and EditorsChoiceFragment are subscribed to this event. Relevant code to fetch images by search query is handled in each of these fragments based on the type argument.
+ 
+* Created `UpdateSavedEvent` event. PopularFragment, LatestFragment, SavedFragment and EditorsChoiceFragment are subscribed to this event. This event is invoked when a new image is saved or a saved image is deleted by the user. This event updates the save status of the image displayed in these fragments.
+ 
+* Created `ItemsListAdapter`, `ItemsSavedListAdapter` adapters. They both extend ItemsBaseAdapter adapter. Code to display image and save status of each photo, save photo into database or delete saved photo from the database and invoke UpdateSavedEvent when user clicks on 'Save' or 'Unsave' option on the image is handled in these adapters.
+ 
+* Implemented the CRUD operations in `DatabaseUtil` so photo information can be queried, saved, and loaded from a local db.
+ 
+* Implemented `ApiService.getPopularPhotos`, `ApiService.getLatestPhotos`, `ApiService.getEditorsChoicePhotos` methods. These methods call the relevant Pixabay APIs to fetch images. Pagenumber is passed as an argument to these methods. Pixabay returns 20 photos for each page.
+ 
+* Implemented `ApiService.searchPhotos`, `ApiService.searchLatestPhotos`, `ApiService.searchEditorsChoicePhotos` methods. These methods call the relevant Pixabay APIs to fetch images matching the search query. Pagenumber is passed as an argument to these methods. Pixabay returns 20 photos for each page.
+ 
+* Implemented test cases to test activity life cycle, test if view pager, tablayout and fragments are rendered. Test case to populate PopularFragment and perform click operation on the save button of the image.
+ 
+* Implemented test cases to test database connection, CRUD operations.
 
-- Does the save functionality work properly?
+## New features in UI
 
-- Are the enhancements creative, challenging to implement, and just plain cool?
+- TabLayout, view pager, floating Action Button to display Pixabay logo
 
-- Is the code well structured, easy to read and understand, and organized well?
+- `Snackbar` to display messages in the following cases:
+	* User is not connected to the network
+	* No results are found for the search query user submitted using SearchView
+	* Photo could not be saved to database whern user clicks on save option of the photo
 
-To work on the project:
+## New libraries used
 
-- Ensure you have the latest version of Android Studio and the v23 Android Build Tools.
+`Robolectric` to implement test cases
 
-- Fork and clone the repo.
+##Future Enhancements
 
-- Open up the project with Android Studio. You can build the project using [Gradle][gradle].
+- Support for displaying image in full screen mode
 
-# Part 1
+- Support for sharing image via Share option
 
-If you’ve tried AltspaceVR on Android, you'll have noticed that we have a number of scrollable views that show preview images of the spaces and events you can visit. In this app, you'll apply similar techniques in order to let users search and browse images and save the ones they like.
+- Support for setting image as wallpaper
 
-The example project should provide a good foundation for the app. The places in the code you need to implement are commented `YOUR CODE HERE`. Also, there is a small example unit test in place, feel free to add additional tests as needed. For your reference, we've also included a sample completed `ImageSearcher.APK` in the Project directory that demonstrates what you should have working after finishing Part 1.
+- Support for landscape screen mode 
 
-## Part 1a
-
-For Part 1a, you will need to implement the necessary functionality to fetch images info from the API, hand it off to the PhotosFragment, generate the image for rendering, and implement the adapter for the RecyclerView. The methods you'll need to implement are:
-
-* `ApiService.getDefaultPhotos` and `ApiService.searchPhotos` - These methods should call the relevant Pixabay APIs to fetch and search for images, and post the results to the EventBus. We've provided a [Retrofit][retrofit] service you can use, or you can use your HTTP library of choice.
-
-* `PhotosFragment.onEvent` (both overloads) - These methods should receive the events on the event bus, update the fragment properly, and notify the list that the data has changed.
-
-* `ItemsListAdapter.onBindViewHolder` - This method should do the typical RecyclerView lifecycle event and fill in the ViewHolder properly so the images will be drawn in the list.
-
-By the end of this part, you should have photos drawing in the list, they should be scrollable and load as you scroll, and you should be able to run a search against the API and see the results.
-
-## Part 1b
-
-For Part 1b, you will implement the "Save" functionality. For this part:
-
-* Implement the CRUD operations in `DatabaseUtil` so photo information can be queried, saved, and loaded from a local db.
-
-* Update `ItemListAdapter.onBindViewHolder` to have the proper `ClickListener` attached when the user clicks the `saveText` label on the `ViewHolder`. When clicked, this label should toggle between the photo being saved in the user's local db or deleted.
-
-# Part 2 - Enhancements
-
-Now that you have a working app for browsing + saving images, build some functionality that might be fun that showcases your skills and creativity. This is the open-ended part of the project, and is your chance to blow us away!
-
-Some potential ideas:
-
-- Add multiple tabs so you can easily browse your saved images.
-
-- Add the ability to save searches.
-
-- Add some type of photo editing and sharing tools.
-
-- Anything you want! Is there some new Android library or API you want to try? Use this as an excuse. Feel free to add any new Activities to the app as needed.
-
-Feel free to use 3rd party code or assets for this part of the project, keeping in mind our assessment criteria (noted at the top of the README.)
-
-## Deliverable
-
-In your repo, you should clobber this README file with your own describing your project. Any instructions or known issues should be documented in the README as well.
-
-**Please be sure to commit a built APK to your repo**, just in case we have trouble getting your project to build.
-
-E-mail us a link to your Github repo to [projects@altvr.com](mailto:projects@altvr.com). Please include your contact information, and if you haven't submitted it to us already, your resume and cover letter.
-
-We hope you have fun working on the project, and we can't wait to see what you come up with!
-
-[The Altspace Team](http://altvr.com/team/)
-
-[gradle]: http://gradle.org/
-[retrofit]: http://square.github.io/retrofit/
 [pixabay]:https://pixabay.com/api/docs/
